@@ -1,0 +1,7 @@
+src/modules/notifications/
+src/modules/expenses/
+src/modules/hr/
+src/modules/inventory/
+src/routes/index.ts
+src/app.ts
+src/server.ts

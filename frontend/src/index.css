@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { @apply border-char-800; }
+  body { @apply bg-char-950 text-sesame-50 antialiased; font-family: 'Tajawal', system-ui, sans-serif; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: hsl(24deg 7% 20%); border-radius: 3px; }
+}

@@ -1,0 +1,42 @@
+import { Router } from "express";
+import authRoutes from "../modules/auth/auth.routes";
+import orderRoutes from "../modules/orders/orders.routes";
+import productRoutes from "../modules/products/products.routes";
+import inventoryRoutes from "../modules/inventory/inventory.routes";
+import customerRoutes from "../modules/customers/customers.routes";
+import supplierRoutes from "../modules/suppliers/suppliers.routes";
+import employeeRoutes from "../modules/employees/employees.routes";
+import branchRoutes from "../modules/branches/branches.routes";
+import cashRegisterRoutes from "../modules/cashRegister/cashRegister.routes";
+import dashboardRoutes from "../modules/dashboard/dashboard.routes";
+import settingsRoutes from "../modules/settings/settings.routes";
+import reportsRoutes from "../modules/reports/reports.routes";
+import hrRoutes from "../modules/hr/hr.routes";
+import payrollRoutes from "../modules/payroll/payroll.routes";
+import wasteRoutes from "../modules/waste/waste.routes";
+import expenseRoutes from "../modules/expenses/expense.routes";
+import recipeRoutes from "../modules/recipe/recipe.routes";
+import notificationRoutes from "../modules/notifications/notification.routes";
+
+const router = Router();
+
+router.use("/auth", authRoutes);
+router.use("/orders", orderRoutes);
+router.use("/products", productRoutes);
+router.use("/inventory", inventoryRoutes);
+router.use("/customers", customerRoutes);
+router.use("/suppliers", supplierRoutes);
+router.use("/employees", employeeRoutes);
+router.use("/branches", branchRoutes);
+router.use("/cash-register", cashRegisterRoutes);
+router.use("/dashboard", dashboardRoutes);
+router.use("/settings", settingsRoutes);
+router.use("/reports", reportsRoutes);
+router.use("/hr", hrRoutes);
+router.use("/payroll", payrollRoutes);
+router.use("/waste", wasteRoutes);
+router.use("/expenses", expenseRoutes);
+router.use("/recipe", recipeRoutes);
+router.use("/notifications", notificationRoutes);
+
+export default router;
