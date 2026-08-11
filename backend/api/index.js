@@ -18,44 +18,34 @@ app.use(apiRateLimiter);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok', env: process.env.NODE_ENV }));
 
-// Load tsx for TypeScript modules
+// Load tsx for TypeScript
 require('tsx/cjs');
 
-const routes = [
-  { path: '/api/v1/auth', mod: '../src/modules/auth/auth.routes' },
-  { path: '/api/v1/orders', mod: '../src/modules/orders/orders.routes' },
-  { path: '/api/v1/products', mod: '../src/modules/products/products.routes' },
-  { path: '/api/v1/customers', mod: '../src/modules/customers/customers.routes' },
-  { path: '/api/v1/suppliers', mod: '../src/modules/suppliers/suppliers.routes' },
-  { path: '/api/v1/employees', mod: '../src/modules/employees/employees.routes' },
-  { path: '/api/v1/branches', mod: '../src/modules/branches/branches.routes' },
-  { path: '/api/v1/settings', mod: '../src/modules/settings/settings.routes' },
-  { path: '/api/v1/reports', mod: '../src/modules/reports/reports.routes' },
-  { path: '/api/v1/dashboard', mod: '../src/modules/dashboard/dashboard.routes' },
-  { path: '/api/v1/cash-register', mod: '../src/modules/cashRegister/cashRegister.routes' },
-  { path: '/api/v1/hr', mod: '../src/modules/hr/hr.routes' },
-  { path: '/api/v1/payroll', mod: '../src/modules/payroll/payroll.routes' },
-  { path: '/api/v1/waste', mod: '../src/modules/waste/waste.routes' },
-  { path: '/api/v1/expenses', mod: '../src/modules/expenses/expense.routes' },
-  { path: '/api/v1/recipe', mod: '../src/modules/recipe/recipe.routes' },
-  { path: '/api/v1/notifications', mod: '../src/modules/notifications/notification.routes' },
-  { path: '/api/v1/inventory', mod: '../src/modules/inventory/inventory.routes' },
-];
-
-routes.forEach(({ path, mod }) => {
-  try {
-    app.use(path, require(mod).default);
-  } catch(e) {
-    console.error(`Route ${path}:`, e.message);
-  }
-});
+try { app.use('/api/v1/auth', require('../src/modules/auth/auth.routes').default); } catch(e) { console.error('auth:', e.message); }
+try { app.use('/api/v1/orders', require('../src/modules/orders/orders.routes').default); } catch(e) { console.error('orders:', e.message); }
+try { app.use('/api/v1/products', require('../src/modules/products/products.routes').default); } catch(e) { console.error('products:', e.message); }
+try { app.use('/api/v1/customers', require('../src/modules/customers/customers.routes').default); } catch(e) { console.error('customers:', e.message); }
+try { app.use('/api/v1/suppliers', require('../src/modules/suppliers/suppliers.routes').default); } catch(e) { console.error('suppliers:', e.message); }
+try { app.use('/api/v1/employees', require('../src/modules/employees/employees.routes').default); } catch(e) { console.error('employees:', e.message); }
+try { app.use('/api/v1/branches', require('../src/modules/branches/branches.routes').default); } catch(e) { console.error('branches:', e.message); }
+try { app.use('/api/v1/settings', require('../src/modules/settings/settings.routes').default); } catch(e) { console.error('settings:', e.message); }
+try { app.use('/api/v1/reports', require('../src/modules/reports/reports.routes').default); } catch(e) { console.error('reports:', e.message); }
+try { app.use('/api/v1/dashboard', require('../src/modules/dashboard/dashboard.routes').default); } catch(e) { console.error('dashboard:', e.message); }
+try { app.use('/api/v1/cash-register', require('../src/modules/cashRegister/cashRegister.routes').default); } catch(e) { console.error('cashRegister:', e.message); }
+try { app.use('/api/v1/hr', require('../src/modules/hr/hr.routes').default); } catch(e) { console.error('hr:', e.message); }
+try { app.use('/api/v1/payroll', require('../src/modules/payroll/payroll.routes').default); } catch(e) { console.error('payroll:', e.message); }
+try { app.use('/api/v1/waste', require('../src/modules/waste/waste.routes').default); } catch(e) { console.error('waste:', e.message); }
+try { app.use('/api/v1/expenses', require('../src/modules/expenses/expense.routes').default); } catch(e) { console.error('expenses:', e.message); }
+try { app.use('/api/v1/recipe', require('../src/modules/recipe/recipe.routes').default); } catch(e) { console.error('recipe:', e.message); }
+try { app.use('/api/v1/notifications', require('../src/modules/notifications/notification.routes').default); } catch(e) { console.error('notifications:', e.message); }
+try { app.use('/api/v1/inventory', require('../src/modules/inventory/inventory.routes').default); } catch(e) { console.error('inventory:', e.message); }
 
 app.use((_req, res) => res.status(404).json({ error: 'Not found' }));
 app.use((err, _req, res, _next) => {
-  const message = process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message;
+  const msg = err.message || 'Internal server error';
   const status = err.statusCode || 500;
-  console.error('Error:', err.message, err.stack?.split('\n').slice(0, 3).join(' | '));
-  res.status(status).json({ success: false, error: { code: err.code || 'INTERNAL_ERROR', message } });
+  console.error('Error:', msg);
+  res.status(status).json({ success: false, error: { code: err.code || 'INTERNAL_ERROR', message: msg } });
 });
 
 module.exports = app;
