@@ -12,9 +12,10 @@ const navItems: NavItem[] = [
   { id:'haccp', label:'HACCP الجودة', icon:'fa-shield-check', section:'الجودة' },
   { id:'workflow', label:'سير العمل', icon:'fa-diagram-project', section:'الجودة' },
   { id:'assets', label:'صيانة الأصول', icon:'fa-screwdriver-wrench', section:'الجودة' },
-  { id:'employees', label:'الموظفين', icon:'fa-user-tie', section:'الموارد البشرية' },
+  { id:'employees', label:'الموظفون', icon:'fa-user-tie', section:'الموارد البشرية' },
   { id:'attendance', label:'الحضور', icon:'fa-clock', section:'الموارد البشرية' },
-  { id:'payroll', label:'الرواتب', icon:'fa-file-invoice-dollar', section:'الموارد البشرية' },
+  { id:'calendar', label:'الإجازات', icon:'fa-calendar-days', section:'الموارد البشرية' },
+  { id:'payroll', label:'كشف المرتب', icon:'fa-file-invoice-dollar', section:'الموارد البشرية' },
   { id:'reports', label:'التقارير', icon:'fa-chart-bar', section:'تقارير' },
   { id:'settings', label:'الإعدادات', icon:'fa-cog', section:'النظام' },
 ];
