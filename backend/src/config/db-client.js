@@ -1,5 +1,6 @@
 // HTTP-based DB client — calls Supabase db-proxy Edge Function
 const SUPABASE_FN_URL = process.env.DB_PROXY_URL;
+const SUPABASE_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdnhydXV1Znl1eXBlc296bHdoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NjM5Njk4MCwiZXhwIjoyMTAxOTcyOTgwfQ.4NT1CKvY6hvUZbxOG4UGiW23qxwj8PpPbdrG4IctHEY";
 
 function escapeSql(val) {
   if (val === null || val === undefined) return "NULL";
@@ -14,13 +15,16 @@ async function dbQuery(sql) {
 
   const res = await fetch(SUPABASE_FN_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${SUPABASE_SERVICE_KEY}`,
+    },
     body: JSON.stringify({ sql }),
   });
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`DB proxy error ${res.status}: ${text}`);
+    throw new Error(`DB proxy error ${res.status}`);
   }
 
   const payload = await res.json();
