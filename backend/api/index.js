@@ -1,41 +1,43 @@
-// Vercel serverless Express entrypoint — uses HTTP db proxy for Supabase
+// Vercel serverless Express entrypoint
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
-const helmetMiddleware = helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' }, contentSecurityPolicy: false });
-const apiRateLimiter = rateLimit({ windowMs: 60000, max: 100, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many requests' } });
+const h = helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' }, contentSecurityPolicy: false });
+const r = rateLimit({ windowMs: 60000, max: 100, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many requests' } });
 
 const app = express();
 app.set('trust proxy', 1);
-app.use(helmetMiddleware);
+app.use(h);
 app.use(cors({ origin: true, credentials: true }));
 app.use(compression());
 app.use(express.json({ limit: '2mb' }));
-app.use(apiRateLimiter);
+app.use(r);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok', env: process.env.NODE_ENV, proxy: process.env.DB_PROXY_URL ? 'configured' : 'missing' }));
 
-// Load TSX for remaining TS modules
+// Auth — uses pure JS module (no Prisma, no TSX)
+app.use('/api/v1/auth', require('../src/modules/auth/auth.routes.js'));
+
+// Load TSX for remaining TS routes
 require('tsx/cjs');
 
-// Auth uses JS version (HTTP proxy) — no Prisma direct connection needed
-app.use('/api/v1/auth', require('../src/modules/auth/auth.routes').default);
-
-// Other routes (may still need DB_PROXY_URL set or will use Prisma if available)
-try { app.use('/api/v1/products', require('../src/modules/products/products.routes').default); } catch(e) {}
-try { app.use('/api/v1/orders', require('../src/modules/orders/orders.routes').default); } catch(e) {}
-try { app.use('/api/v1/customers', require('../src/modules/customers/customers.routes').default); } catch(e) {}
-try { app.use('/api/v1/branches', require('../src/modules/branches/branches.routes').default); } catch(e) {}
-try { app.use('/api/v1/settings', require('../src/modules/settings/settings.routes').default); } catch(e) {}
-try { app.use('/api/v1/dashboard', require('../src/modules/dashboard/dashboard.routes').default); } catch(e) {}
-try { app.use('/api/v1/reports', require('../src/modules/reports/reports.routes').default); } catch(e) {}
-try { app.use('/api/v1/cash-register', require('../src/modules/cashRegister/cashRegister.routes').default); } catch(e) {}
-try { app.use('/api/v1/hr', require('../src/modules/hr/hr.routes').default); } catch(e) {}
-try { app.use('/api/v1/payroll', require('../src/modules/payroll/payroll.routes').default); } catch(e) {}
-try { app.use('/api/v1/inventory', require('../src/modules/inventory/inventory.routes').default); } catch(e) {}
+const tsRoutes = [
+  ['/api/v1/products', '../src/modules/products/products.routes'],
+  ['/api/v1/orders', '../src/modules/orders/orders.routes'],
+  ['/api/v1/customers', '../src/modules/customers/customers.routes'],
+  ['/api/v1/branches', '../src/modules/branches/branches.routes'],
+  ['/api/v1/settings', '../src/modules/settings/settings.routes'],
+  ['/api/v1/dashboard', '../src/modules/dashboard/dashboard.routes'],
+  ['/api/v1/reports', '../src/modules/reports/reports.routes'],
+  ['/api/v1/cash-register', '../src/modules/cashRegister/cashRegister.routes'],
+  ['/api/v1/hr', '../src/modules/hr/hr.routes'],
+  ['/api/v1/payroll', '../src/modules/payroll/payroll.routes'],
+  ['/api/v1/inventory', '../src/modules/inventory/inventory.routes'],
+];
+tsRoutes.forEach(([path, mod]) => { try { app.use(path, require(mod).default); } catch(e) { /* skip */ } });
 
 app.use((_req, res) => res.status(404).json({ error: 'Not found' }));
 app.use((err, _req, res, _next) => {
