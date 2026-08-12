@@ -1,46 +1,36 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AppLayout } from "@/components/AppLayout";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import LoginPage from "@/pages/LoginPage";
-import DashboardPage from "@/pages/DashboardPage";
-import CashierPage from "@/pages/CashierPage";
-import ProductsPage from "@/pages/ProductsPage";
-import InventoryPage from "@/pages/InventoryPage";
-import CustomersPage from "@/pages/CustomersPage";
-import SuppliersPage from "@/pages/SuppliersPage";
-import EmployeesPage from "@/pages/EmployeesPage";
-import BranchesPage from "@/pages/BranchesPage";
-import CashRegisterPage from "@/pages/CashRegisterPage";
-import ReportsPage from "@/pages/ReportsPage";
-import SettingsPage from "@/pages/SettingsPage";
+import { useState } from 'react';
+import Sidebar from './components/Shell/Sidebar';
+import Topbar from './components/Shell/Topbar';
+import CommandPalette from './components/Shell/CommandPalette';
+import DashboardPage from './pages/Dashboard/DashboardPage';
+import TasksPage from './pages/Tasks/TasksPage';
+import WorkflowPage from './pages/Workflow/WorkflowPage';
+import HACCPPage from './pages/HACCP/HACCPPage';
+import AssetsPage from './pages/Assets/AssetsPage';
 
-const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000, refetchOnWindowFocus: false } } });
+const PAGES: Record<string, { title: string; sub: string; component: React.FC }> = {
+  dashboard: { title:'لوحة القيادة — Command Center', sub:'نظرة شاملة على أداء المؤسسة', component:DashboardPage },
+  tasks: { title:'إدارة المهام', sub:'Kanban Board لإدارة سير العمل', component:TasksPage },
+  workflow: { title:'بناء سير العمل', sub:'محرر سير العمل البصري', component:WorkflowPage },
+  haccp: { title:'HACCP — نقاط التحكم الحرجة', sub:'إدارة جودة وسلامة الغذاء', component:HACCPPage },
+  assets: { title:'صيانة الأصول', sub:'إدارة صيانة المعدات والأصول', component:AssetsPage },
+};
 
 export default function App() {
+  const [page, setPage] = useState('dashboard');
+  const [mini, setMini] = useState(false);
+  const [cmdK, setCmdK] = useState(false);
+  const pageInfo = PAGES[page] || PAGES.dashboard;
+  const PageComponent = pageInfo.component;
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route element={<ProtectedRoute />}>
-            <Route element={<AppLayout />}>
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/pos" element={<CashierPage />} />
-              <Route path="/products" element={<ProductsPage />} />
-              <Route path="/inventory" element={<InventoryPage />} />
-              <Route path="/customers" element={<CustomersPage />} />
-              <Route path="/suppliers" element={<SuppliersPage />} />
-              <Route path="/employees" element={<EmployeesPage />} />
-              <Route path="/branches" element={<BranchesPage />} />
-              <Route path="/cash-register" element={<CashRegisterPage />} />
-              <Route path="/reports" element={<ReportsPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/" element={<DashboardPage />} />
-            </Route>
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <div className="shell">
+      <Sidebar active={page} onNavigate={setPage} mini={mini} onToggle={()=>setMini(!mini)} />
+      <main className="main">
+        <Topbar pageTitle={pageInfo.title} pageSub={pageInfo.sub} onCmdK={()=>setCmdK(true)} />
+        <div className="content"><PageComponent /></div>
+      </main>
+      <CommandPalette open={cmdK} onClose={()=>setCmdK(false)} onNavigate={(id)=>{setPage(id);setCmdK(false)}} />
+    </div>
   );
 }
